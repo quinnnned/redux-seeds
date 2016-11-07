@@ -1,1 +1,1 @@
-export const toggleTree = require('./seeds/toggle').default;
+export const toggleTree = require('./seeds/toggleTree').default;
