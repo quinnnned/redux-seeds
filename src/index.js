@@ -1,1 +1,1 @@
-export const placeholder = () => 'foo';
+export const placeholder = () => 'travis-test';
