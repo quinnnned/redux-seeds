@@ -36,7 +36,7 @@
     "test": "cross-env BABEL_ENV=commonjs tape -r babel-register test/**/*.js",
     "build": "cross-env BABEL_ENV=commonjs babel src --out-dir lib",
     "prepublish": "npm run clean && npm run test && npm run build && check-es3-syntax lib/ --kill --print",
-    "watch": "watch 'npm test | faucet' src test"
+    "watch": "watch 'npm -s t | tap-summary' src test"
   },
   "devDependencies": {
     "babel-cli": "^6.3.15",
@@ -71,6 +71,7 @@
     "faucet": "0.0.1",
     "nyc": "^8.1.0",
     "rimraf": "^2.3.4",
+    "tap-summary": "^3.0.1",
     "tape": "^4.6.0",
     "watch": "^0.19.2"
   }

@@ -1,3 +1,1 @@
-export const placeholder = () => 'coveralls-test';
-
-export const thisFunctionIsNotCovered = (x) => 2*x;
+export const toggleTree = require('./seeds/toggle').default;
