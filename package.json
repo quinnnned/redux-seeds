@@ -1,6 +1,6 @@
 {
   "name": "redux-seeds",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Factories for Generating Common Redux State Trees",
   "repository": {
     "type": "git",
