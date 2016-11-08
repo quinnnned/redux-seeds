@@ -1,4 +1,5 @@
 import camelToUpperSnake from '../lib/camelToUpperSnake';
+import createStateTree from './createStateTree';
 
 export default ({
     defaultState = false,
@@ -15,21 +16,22 @@ export default ({
     const ON_ACTION_TYPE  = camelToUpperSnake(onActorName);
     const OFF_ACTION_TYPE = camelToUpperSnake(offActorName);
 
-    // Return State Tree
-    return ({
-        get: {
-            compose: 'TODO',
-            [selectorName]: () => (state = defaultState) => state
-        }, 
-        act: {
-            compose: 'TODO',
-            [onActorName]: () => ({ type: ON_ACTION_TYPE }),
-            [offActorName]: () => ({ type: OFF_ACTION_TYPE })
-        },
-        reducer: (state = defaultState, {type} = {}) => {
-            if (type === ON_ACTION_TYPE) return true;
-            if (type === OFF_ACTION_TYPE) return false;
-            return state;
+    //// Create State Tree
+    const tree = createStateTree({
+        defaultState,
+        actionHandlers: {
+            [ON_ACTION_TYPE]: () => true,
+            [OFF_ACTION_TYPE]: () => false
         }
-    });
+    })
+
+    //// Attach selectors
+    tree.get[selectorName] = () => (state = defaultState) => state;
+
+    //// Attach Actors
+    tree.act[onActorName]  = () => ({ type: ON_ACTION_TYPE });
+    tree.act[offActorName] = () => ({ type: OFF_ACTION_TYPE }); 
+
+    //// Return Mutated State Tree
+    return tree;
 };
