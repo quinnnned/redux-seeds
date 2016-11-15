@@ -62,8 +62,37 @@ test('keyedTree: key isolation', (assert) => {
 })
 
 
-// TODO
+
+test('keyedTree: keyName', (assert) => {
+
+    const { get, act, reducer } = keyedTree({
+        keyName: 'id',
+        subTree: toggleTree({
+            selectorName : 'isActive',
+            onActorName  : 'activate',
+            offActorName : 'deactivate'
+        })
+    });
+
+    const test = (id) => (...actions) => get.isActive({id})( actions.reduce(reducer, {}) ); 
+    const activate = (id) => act.activate({id});
+    const deactivate = (id) => act.deactivate({id});
+
+    assert.equal( test('bob')(), false);
+    assert.equal( test('bob')( activate('bob') ), true);
+    assert.equal( test('bob')( activate('bob'), deactivate('bob') ), false);
+    assert.equal( test('bob')( activate('alice') ), false);
+    assert.equal( test('bob')( activate('bob'), deactivate('alice') ), true);
+    assert.equal( test('bob')( activate('bob'), deactivate('bob'), activate('alice') ), false);
+    assert.end();
+})
+
 test('keyedTree: removeActorName', (assert) => {
+
+    // override console.error
+    const originalConsoleError = console.error;
+    let lastError = null;
+    console.error = (e) => lastError = e;
 
     const { reducer, get, act } = keyedTree({
         removeActorName: 'explodeSpaceship',
@@ -71,6 +100,12 @@ test('keyedTree: removeActorName', (assert) => {
     });
 
     const test = (key) => (...actions) => get.isFiringLasers({key})( actions.reduce(reducer, {}) )
+
+    lastError = null;
+    act.explodeSpaceship();
+    assert.notEqual(lastError, null, `
+        remove actor should complain if the key is not provided.
+    `);
 
     assert.equal( test('zorp')(), false);
     assert.equal( test('zorp')( 
@@ -84,13 +119,24 @@ test('keyedTree: removeActorName', (assert) => {
                 act.startFiringLasers({ key: 'zorp' }),
                 act.explodeSpaceship({ key: 'zorp' })
             ), false);
+
+    // cleanup
+    console.error = originalConsoleError;
     assert.end();
 });
 
-test('keyedTree: default state', ({deepEqual, end}) => {
-    const tree = keyedTree();
-    deepEqual( tree.reducer(), {}, 'reducer should return an empty object by default')
-    end();
+test('keyedTree: default state', (assert) => {
+    const tree = keyedTree({
+        subTree: {
+            reducer: x => x,
+            get: {},
+            act: {}
+        }
+    });
+    assert.deepEqual( tree.reducer(), {}, 'reducer should return an empty object by default')
+    const state = {};
+    assert.equal( tree.reducer(state), state, 'reducer should be the identity function if no action is provided')
+    assert.end();
 });
 
 
@@ -101,7 +147,7 @@ test('keyedTree type', ({equal, end}) => {
 
 test('keyedTree output: state tree structure', ({deepEqual, equal, end}) => {
 
-    const tree = keyedTree();
+    const tree = keyedTree({});
 
     equal(tree == null, false, 'should not return null or undefined');
 
