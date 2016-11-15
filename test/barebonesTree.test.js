@@ -29,6 +29,24 @@ test('barebonesTree output: state tree structure', ({deepEqual, equal, end}) => 
     end();
 });
 
+
+test('barebonesTree.reducer', (assert) => {
+
+    const tree = barebonesTree();
+
+    assert.equal(tree.reducer(), null, `
+        should return null by default
+    `);
+
+    const state = {};
+    assert.equal(tree.reducer(state), state, `
+        should be an identity function
+    `);    
+
+    assert.end();
+});
+
+
 test('get.compose', ({equal, end}) => {
 
     const spies = { 
