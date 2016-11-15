@@ -98,3 +98,29 @@ test('act.compose', ({equal, end}) => {
     equal( myTree.act.newActor(spies.options), spies.value, 'composed actor should have the standard actor signature: (options) => value')
     end();
 });
+
+test('get.compose order indifference', (assert) => {
+
+    const tree = barebonesTree();
+
+    tree.get.compose('fourth', ({get}) => (options) => (state) => (
+        get.first()(state) + get.second()(state) + get.third()(state) + '4'
+    ));
+
+    tree.get.compose('third', ({get}) => (options) => (state) => (
+        get.first()(state) + get.second()(state) + '3'
+    ));
+
+    tree.get.compose('second', ({get}) => (options) => (state) => (
+        get.first()(state) + '2'
+    ));
+
+    tree.get.first = () => () => '1';
+    
+    assert.equal( tree.get.fourth()(), '11211234', `
+        the order that selectors are get.compose()'d does not matter;
+        composite selectors can reference other selectors that have not yet been defined.
+    `)
+
+    assert.end();
+});

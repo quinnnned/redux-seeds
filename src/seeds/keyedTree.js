@@ -4,14 +4,22 @@ import camelToUpperSnake from '../lib/camelToUpperSnake';
 export default ({
     subTree = null,
     keyName = 'key',
-    removeActorName = null
+    removeActorName = null,
+    keysSelectorName = null
 } = {}) => {
+    //// Validate options
+    if (subTree === null) throw `"subTree" is a required option for keyedTree`;
+
+    //// The default state for keyedTree must always be an empty object
     const defaultState = {};
 
+    //// Create Basic State Tree
     const tree = createStateTree({ defaultState });
 
+    //// Generate Action Types From Actor Names
     const REMOVE_ACTION_TYPE = camelToUpperSnake(removeActorName);
     
+    //// Attach 'remove' actor if name is provided
     if (removeActorName) {
         tree.act[removeActorName] = (options = {}) => {
 
@@ -31,8 +39,12 @@ export default ({
         } 
     }
 
-    if (subTree == null) return tree;
+    //// Attach 'keys' selector if name is provided
+    if (keysSelectorName) {
+        tree.get[keysSelectorName] = () => (state = defaultState) => Object.keys(state)
+    }
 
+    //// Define Reducer
     tree.reducer = (state = defaultState, action = {}) => {
         const {type = null, payload = {}, ...rest} = action;
         const key = payload[keyName];
@@ -53,6 +65,7 @@ export default ({
         })
     };
 
+    //// Augment SubSelectors with Keyed Functionality
     Object.keys(subTree.get)
         .filter( (key) => key !== 'compose' )
         .filter( (key) => key !== 'composites' )
@@ -76,6 +89,7 @@ export default ({
             } 
         });
 
+    //// Augment SubActors with Keyed Functionality
     Object.keys(subTree.act)
         .filter( (key) => key !== 'compose' )
         .filter( (key) => key !== 'composites' )
@@ -102,7 +116,7 @@ export default ({
             } 
         });
 
-    
+    //// Return Mutated State Tree
     return tree;
 };
 

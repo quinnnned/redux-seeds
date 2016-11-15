@@ -1,39 +1,45 @@
 import {camelToUpperSnake} from '../../../lib/state';
+import createStateTree from './createStateTree';
 
 export default ({ 
-    defaultState=null, 
-    valueName="value", 
-    selectorName = "", 
-    setActorName = null, 
-    clearActorName = null
+    defaultState = null, 
+    valueName    = "value", 
+    selectorName = null, 
+    actorName    = null
 }) => {
 
-    // If not supplied, the actor names will be derived from the selectorName
-    setActorName = setActorName || "set" + selectorName[0].toUpperCase() + selectorName.slice(1);
-    clearActorName = clearActorName || "clear" + selectorName[0].toUpperCase() + selectorName.slice(1);
+    actorName = actorName || "set" + selectorName[0].toUpperCase() 
+                                   + selectorName.slice(1);
 
     // Build Action Types By converting actor names
-    const SET_ACTION_TYPE = camelToUpperSnake(setActorName);
-    const CLEAR_ACTION_TYPE = camelToUpperSnake(clearActorName);
+    const ACTION_TYPE = camelToUpperSnake(setActorName);
 
-    // Return State Tree
-    return ({
-        reducer: (state = defaultState, {type, payload}={}) => {
-            if (type === SET_ACTION_TYPE) return payload[valueName];
-            if (type === CLEAR_ACTION_TYPE) return defaultState;
-            return state;
-        },
-        get: { 
-            [selectorName]: () => (state=defaultState) => state 
-        },
-        act: {
-            [setActorName]:  (options) => ({ 
-                type: SET_ACTION_TYPE, 
-                payload: { 
-                    [valueName]: options[valueName]
-                }
-            }),
-            [clearActorName]: () => ({ type: CLEAR_ACTION_TYPE })
+    const tree = createStateTree({
+        defaultState,
+        actionHandlers: {
+            [ACTION_TYPE]: (state = defaultState, action = {}) => {
+
+                // TODO: Add Checks and Warnings
+                return action.payload[valueName]
+            }        
         }
     })
+
+    //// Attach Selector
+    tree.get[selectorName] = (options = {}) => (state = defaultState) => state;
+
+    //// Attach Actor
+    tree.act[actorName] = (options = {}) => {
+
+        // TODO: Add Checks and Warnings
+
+        return {
+            type: ACTION_TYPE,
+            payload: {
+                [valueName]: options[valueName]
+            }
+        }
+    }
+
+    return tree;
 };

@@ -9,7 +9,7 @@ export default ({
 }={}) => {
     // Validate Inputs
     if ( selectorName === null) throw `"selectorName" is a required parameter for toggleTree seed.`
-    if ( onActorName  === null) throw `"onActorName" is a required parameter for toggleTree seed.`
+    if ( onActorName  === null) throw  `"onActorName" is a required parameter for toggleTree seed.`
     if ( offActorName === null) throw `"offActorName" is a required parameter for toggleTree seed.`
 
     // Generate action type constants from actor names

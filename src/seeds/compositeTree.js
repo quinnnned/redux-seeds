@@ -1,5 +1,3 @@
-import {combineReducers} from 'redux';
-
 export default (branches) => {
 
     const reducer = combineReducers(
