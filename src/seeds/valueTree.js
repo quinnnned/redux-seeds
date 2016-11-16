@@ -1,44 +1,58 @@
-import {camelToUpperSnake} from '../../../lib/state';
-import createStateTree from './createStateTree';
+import blankTree from './blankTree';
+import camelToUpperSnake from '../lib/camelToUpperSnake';
 
-export default ({ 
-    defaultState = null, 
-    valueName    = "value", 
-    selectorName = null, 
-    actorName    = null
-}) => {
+export default ({
+    defaultState = null,
+    selectorName = null,
+    actorName    = null,
+    valueName    = 'value'
+} = {}) => {
+    const tree = blankTree();
 
-    actorName = actorName || "set" + selectorName[0].toUpperCase() 
-                                   + selectorName.slice(1);
+    const ACTION_TYPE = actorName && camelToUpperSnake(actorName);
 
-    // Build Action Types By converting actor names
-    const ACTION_TYPE = camelToUpperSnake(setActorName);
+    tree.reducer = (state = defaultState, action = {}) => {
+        const { type = null, payload = {} } = action;
+        if (type === null) return state;
 
-    const tree = createStateTree({
-        defaultState,
-        actionHandlers: {
-            [ACTION_TYPE]: (state = defaultState, action = {}) => {
-
-                // TODO: Add Checks and Warnings
-                return action.payload[valueName]
-            }        
-        }
-    })
-
-    //// Attach Selector
-    tree.get[selectorName] = (options = {}) => (state = defaultState) => state;
-
-    //// Attach Actor
-    tree.act[actorName] = (options = {}) => {
-
-        // TODO: Add Checks and Warnings
-
-        return {
-            type: ACTION_TYPE,
-            payload: {
-                [valueName]: options[valueName]
+        if (type === ACTION_TYPE) {
+            const value = payload[valueName];
+            if (value === undefined) {
+                console.error(`
+                    Required property "${valueName}" is missing from payload
+                    of action of type "${ACTION_TYPE}", so this action will
+                    be ignored.
+                `);
+                return state;
             }
+            return value;
         }
+        return state;
+    };
+
+    if (selectorName) { 
+        tree.get[selectorName] = (options) => (state = defaultState) => state
+    }
+
+    if (actorName) { 
+        tree.act[actorName] = (options = {}) => {
+
+            const value = options[valueName];
+
+            if (value === undefined) {
+                console.error(`
+                    You forgot to include "${valueName}" in the options you passed
+                    to act.${actorName}.  It's required.
+                `);
+            }
+
+            return {
+                type: ACTION_TYPE,
+                payload: {
+                    [valueName]: value 
+                }
+            };
+        } 
     }
 
     return tree;

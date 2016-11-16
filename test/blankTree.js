@@ -1,14 +1,14 @@
 import test from 'tape';
-import {barebonesTree} from '../src/';
+import {blankTree} from '../src/';
 
-test('barebonesTree type', ({equal, end}) => {
-    equal(typeof barebonesTree, 'function', 'should be a function');
+test('blankTree type', ({equal, end}) => {
+    equal(typeof blankTree, 'function', 'should be a function');
     end();
 });
 
-test('barebonesTree output: state tree structure', ({deepEqual, equal, end}) => {
+test('blankTree output: state tree structure', ({deepEqual, equal, end}) => {
 
-    const tree = barebonesTree();
+    const tree = blankTree();
 
     equal(tree == null, false, 'should not return null or undefined');
 
@@ -30,9 +30,9 @@ test('barebonesTree output: state tree structure', ({deepEqual, equal, end}) => 
 });
 
 
-test('barebonesTree.reducer', (assert) => {
+test('blankTree.reducer', (assert) => {
 
-    const tree = barebonesTree();
+    const tree = blankTree();
 
     assert.equal(tree.reducer(), null, `
         should return null by default
@@ -54,7 +54,7 @@ test('get.compose', ({equal, end}) => {
         state: 'selector-state',
         value: 'selector-value' 
     };
-    const myTree = barebonesTree();
+    const myTree = blankTree();
 
     const getBefore = myTree.get;
 
@@ -80,7 +80,7 @@ test('act.compose', ({equal, end}) => {
         options: 'actor-options',
         value: 'actor-value' 
     };
-    const myTree = barebonesTree();
+    const myTree = blankTree();
 
     const actBefore = myTree.act;
 
@@ -101,7 +101,7 @@ test('act.compose', ({equal, end}) => {
 
 test('get.compose order indifference', (assert) => {
 
-    const tree = barebonesTree();
+    const tree = blankTree();
 
     tree.get.compose('fourth', ({get}) => (options) => (state) => (
         get.first()(state) + get.second()(state) + get.third()(state) + '4'

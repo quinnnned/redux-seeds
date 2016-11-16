@@ -1,11 +1,11 @@
-import barebonesTree from './barebonesTree';
+import blankTree from './blankTree';
 
 export default ({
     defaultState = null,
     actionHandlers = {},
 } = {}) => {
 
-    const tree = barebonesTree();
+    const tree = blankTree();
 
     //// .reducer
     tree.reducer = ( state = defaultState, action = {} ) => {

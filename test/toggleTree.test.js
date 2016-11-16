@@ -4,7 +4,7 @@ import {toggleTree} from '../src/';
 test('toggleTree type', ({equal, end}) => {
     equal(typeof toggleTree, 'function', 'should be a function');
     end();
-})
+});
 
 test('toggleTree parameter validation', ({throws, end}) => {
 
