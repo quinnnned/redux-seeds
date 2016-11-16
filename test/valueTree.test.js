@@ -74,23 +74,30 @@ test('valueTree.act.[actorName]', (assert) => {
 });
 
 test('valueTree actor options validation', (assert) => {
-    // Escalate console.error()
+    let lastError = null;
     const originalConsoleError = console.error;
-    console.error = (e) => { throw e; };
+    console.error = (e) => lastError = e;
 
     const tree = valueTree({
         actorName: 'setUserAge'
     });
 
-    assert.throws( () => tree.act.setUserAge(), /required/, `
+    lastError = null;
+    assert.deepEqual(tree.act.setUserAge(), {}, `
+        actor should return an empty action if the value is not provided
+    `);
+    assert.notEqual(lastError, null, `
         actor should log an error message if value is not provided
     `);
 
-    assert.doesNotThrow( () => tree.act.setUserAge({value: 42}), /required/, `
+    lastError = null;
+    assert.notDeepEqual(tree.act.setUserAge({value: 42}), {}, `
+        actor should not return an empty action if the value is provided
+    `);
+    assert.equal(lastError, null, `
         actor should not log an error message if value is provided
     `);
 
-    // De-Escalate console.error()
     console.error = originalConsoleError;
     assert.end();
 })
