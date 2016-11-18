@@ -1,5 +1,5 @@
 import camelToUpperSnake from '../lib/camelToUpperSnake';
-import createStateTree from './createStateTree';
+import customTree from './customTree';
 
 export default ({
     defaultState = false,
@@ -17,7 +17,7 @@ export default ({
     const OFF_ACTION_TYPE = camelToUpperSnake(offActorName);
 
     //// Create State Tree
-    const tree = createStateTree({
+    const tree = customTree({
         defaultState,
         actionHandlers: {
             [ON_ACTION_TYPE]: () => true,

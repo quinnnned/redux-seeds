@@ -1,4 +1,4 @@
-import createStateTree from './createStateTree';
+import customTree from './customTree';
 import camelToUpperSnake from '../lib/camelToUpperSnake';
 
 export default ({
@@ -14,7 +14,7 @@ export default ({
     const defaultState = {};
 
     //// Create Basic State Tree
-    const tree = createStateTree({ defaultState });
+    const tree = customTree({ defaultState });
 
     //// Generate Action Types From Actor Names
     const REMOVE_ACTION_TYPE = camelToUpperSnake(removeActorName);

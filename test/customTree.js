@@ -1,14 +1,14 @@
 import test from 'tape';
-import {createStateTree} from '../src/';
+import {customTree} from '../src/';
 
-test('createStateTree type', ({equal, end}) => {
-    equal(typeof createStateTree, 'function', 'should be a function');
+test('customTree type', ({equal, end}) => {
+    equal(typeof customTree, 'function', 'should be a function');
     end();
 });
 
-test('createStateTree output: state tree structure', ({deepEqual, equal, end}) => {
+test('customTree output: state tree structure', ({deepEqual, equal, end}) => {
 
-    const tree = createStateTree();
+    const tree = customTree();
 
     equal(tree == null, false, 'should not return null or undefined');
 
@@ -29,19 +29,19 @@ test('createStateTree output: state tree structure', ({deepEqual, equal, end}) =
     end();
 });
 
-test('createStateTree: defaultState', ({equal, end}) => {
+test('customTree: defaultState', ({equal, end}) => {
 
-    const nullTree = createStateTree();
+    const nullTree = customTree();
     equal( nullTree.reducer(), null, 'reducer should return null by default' );
 
     const defaultState = {};
-    const treeWithDefaultState = createStateTree({defaultState});
+    const treeWithDefaultState = customTree({defaultState});
     equal(treeWithDefaultState.reducer(), defaultState, 'if defaultState is specified, reducer should return that value by default');
 
     end();
 });
 
-test('createStateTree: actionHandlers --> reducer', ({equal, end}) => {
+test('customTree: actionHandlers --> reducer', ({equal, end}) => {
 
     const oldConsoleError = console.error;
     let consoleErrorWasCalled = false;
@@ -49,7 +49,7 @@ test('createStateTree: actionHandlers --> reducer', ({equal, end}) => {
 
     const spies = { state: 'this-is-the-old-state', newState: 'this-is-the-new-state', defaultState: 'default-state' };
 
-    const test = (state, action) => createStateTree({
+    const test = (state, action) => customTree({
         defaultState: spies.defaultState,
         actionHandlers: {
             'THIS_ACTION_TYPE': (handlerState, handlerAction) => {
@@ -82,7 +82,7 @@ test('get.compose', ({equal, end}) => {
         state: 'selector-state',
         value: 'selector-value' 
     };
-    const myTree = createStateTree();
+    const myTree = customTree();
 
     const getBefore = myTree.get;
 
@@ -108,7 +108,7 @@ test('act.compose', ({equal, end}) => {
         options: 'actor-options',
         value: 'actor-value' 
     };
-    const myTree = createStateTree();
+    const myTree = customTree();
 
     const actBefore = myTree.act;
 
