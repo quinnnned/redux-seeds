@@ -1,74 +1,57 @@
+import blankTree from './blankTree';
+
 export default (branches) => {
 
-    const reducer = combineReducers(
-                        Object.keys(branches)
-                            .reduce( (reducers, branchName) => (
-                                Object.assign({}, reducers, {
-                                    [branchName]: branches[branchName].reducer
-                                })
-                            ), {})
-                    );
-    let get = {};
-    let act = {};
+    const defaultState = {};
 
-    Object.keys(branches).map( (branchName) => {
-        const branch = branches[branchName]; 
+    const tree = blankTree();
 
-        //// .get
-        Object.keys(branch.get).forEach( (selectorName) => {
-            const selector = branch.get[selectorName];
-            if (typeof selector === 'function') {
-                // selector of form branch.get = (options) => (state) => (value)
-                get = Object.assign({}, get, {
-                    [selectorName]: (options) => (state) => selector(options)(state[branchName])
-                });
+    const branchNames = Object.keys(branches);
+    branchNames.forEach( (branchName) => {
+
+        //// Attach Branch Selectors
+        const branchGet = branches[branchName].get || {};
+        Object.keys(branchGet)
+            .filter( (selectorName) => selectorName != 'compose')
+            .filter( (selectorName) => selectorName != 'composites')
+            .forEach( (selectorName) => {
+                const branchSelector = branchGet[selectorName];
+                tree.get[selectorName] = (options = {}) => (
+                    (state = defaultState) => (
+                        branchSelector(options)(state[branchName])
+                    )  
+                );
+            });
+
+        //// Attach Branch Actors
+        const branchAct = branches[branchName].act || {};
+        Object.keys(branchAct)
+            .filter( (actorName) => actorName != 'compose')
+            .filter( (actorName) => actorName != 'composites')
+            .forEach( (actorName) => {
+                const branchActor = branchAct[actorName];
+                tree.act[actorName] = (options = {}) => branchActor(options);
+            });
+    });
+
+    //// Define Composite Reducer
+    tree.reducer = (state = {}, action) => {
+        let stateChanged = false;
+        const nextState = {};
+
+        branchNames.forEach( (branchName) => {
+            const branchState = state[branchName];
+            const branchReducer = branches[branchName].reducer;
+            nextState[branchName] = branchReducer(branchState, action);
+            if (nextState[branchName] !== branchState) {
+                stateChanged = true;
             }
-        });
+        })
 
-        //// .act
-        Object.keys(branch.act || {} ).forEach( (actorName) => {
-            const actor = branch.act[actorName];
-            if (typeof actor === 'function') {
-                // selector of form branch.act = (options) => action || (options) => (dispatch) => void    
-                act = Object.assign({}, act, {
-                    [actorName]: actor
-                });
-            }
-        });
-
-        // temporary
-        Object.keys(branch.reducer).forEach( (selectorName) => {
-            const selector = branch.reducer[selectorName];
-            reducer[selectorName] = (state,...rest) => selector(state[branchName], ...rest)
-        });
-
-    })
-
-    get.composites = {};
-    get.compose = function(name, composite) {
-        this.composites[name] = composite;
-        this[name] = composite(this, reducer);
+        if (!stateChanged) return state;
+        return nextState;
     };
 
-
-    act.composites = {};
-    act.compose = function(name, composite) {
-        this.composites[name] = composite;
-        this[name] = (options) => {
-            const action = composite(this, get)(options);
-            
-            // If actor returns an array of actions, 
-            // convert to a thunk which dispatches
-            // each action in order. (maybe middleware this?)
-            if (typeof action.forEach === 'function') {
-                return (dispatch) => action.forEach(dispatch);
-            }
-
-            // Otherwise return action
-            return action;
-        };
-    };
-
-
-    return { get, reducer, act };
+    //// Return Mutated State Tree
+    return tree;
 };
