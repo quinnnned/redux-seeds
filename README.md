@@ -56,11 +56,11 @@ const { reducer, act, get } = durationTree('FetchingData');
 ````
 
 How about if you need to keep track of the state of multiple async requests?
-That's only a few more lines of code by wrapping your existing reducer with the
-keyedTree seed:
+That's only a few more lines of code:
 
 ````js
-/* This will have the same action creators and selectors as above, except now
+/* 
+ * This will have the same action creators and selectors as above, except now
  * now their options will be required to include the property 'requestId', to
  * specify a unique branch of the tree: 
  *
@@ -73,3 +73,48 @@ const { reducer, act, get } = keyedTree({
     subTree: durationTree('FetchingData');
 });
 ````
+
+Mix and match to build complex state trees with very little code:
+````js
+const ( reducer, act, get ) = branchedTree({
+    isFetching: keyedTree({
+        keyName : 'requestId',
+        subTree : durationTree('FetchingData');
+    }),
+    user: branchedTree({
+        isAuthenticated: toggleTree({
+            selectorName : 'isUserAuthenticated',
+            onActorName  : 'authenticateUser',
+            offActorName : 'deAuthenticateUser'  
+        }),
+        name: valueTree({
+            selectorName : 'userName',
+            actorName    : 'setUserName'
+        })
+    }),
+    grid3d: keyedTree({
+        keyName : 'x',
+        subTree : keyedTree({
+            keyName : 'y',
+            subTree : keyedTree({
+                keyName : 'z',
+                subTree : valueTree('
+                    selectorName : 'gridValue',
+                    actorName    : 'setGridValue'
+                ')
+            })
+        })
+    })
+});
+````
+
+# valueTree Seed
+````js
+const { reducer, get, act } = valueTree({
+    defaultState, // optional, default: null
+    selectorName  // optional, default: null
+    actorName,    // optional, default: null
+    valueName,    // optional, default: 'value'
+})
+````
+
