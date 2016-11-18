@@ -1,15 +1,15 @@
 import test from 'tape';
-import {compositeTree} from '../src';
+import {branchedTree} from '../src';
 
-test('compositeTree type', (assert) => {
-    assert.equal( typeof compositeTree, 'function', `
+test('branchedTree type', (assert) => {
+    assert.equal( typeof branchedTree, 'function', `
         should be a function
     `);
     assert.end();
 })
 
-test('compositeTree reducer composition', (assert) => {
-    const tree = compositeTree({
+test('branchedTree reducer composition', (assert) => {
+    const tree = branchedTree({
         counter: {
             reducer: (state = 0, action = {}) => (
                 action.type === 'increment' ? state + 1 : state
@@ -33,8 +33,8 @@ test('compositeTree reducer composition', (assert) => {
     assert.end();
 });
 
-test('compositeTree selector composition', (assert) => {
-    const tree = compositeTree({
+test('branchedTree selector composition', (assert) => {
+    const tree = branchedTree({
         counter: {
             reducer: (state = 0, action = {}) => (
                 action.type === 'increment' ? state + 1 : state
@@ -75,8 +75,8 @@ test('compositeTree selector composition', (assert) => {
     assert.end();
 });
 
-test('compositeTree actor composition', (assert) => {
-    const tree = compositeTree({
+test('branchedTree actor composition', (assert) => {
+    const tree = branchedTree({
         counter: {
             reducer: (state = 0, action = {}) => (
                 action.type === 'increment' ? state + 1 : state
