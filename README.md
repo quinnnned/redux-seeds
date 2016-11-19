@@ -39,40 +39,29 @@ A seed is a factory function that returns a specific type of state tree.
 For example, need a part of your state tree that represents whether or not some
 async event is occuring? That's one line of code with the durationTree seed:
 ````js
-/* 
- * What you get for free:
- *
- *  + Reducer:
- *       responds to START_FETCHING_DATA and STOP_FETCHING_DATA action types
- *
- *  + Selector: 
- *     get.isFetchingData()(state)
- *
- *  + Two Action Creators: 
- *      act.startFetchingData(): returns a START_FETCHING_DATA action
- *      act.stopFetchingData(): returns a STOP_FETCHING_DATA action 
- */
 const { reducer, act, get } = durationTree('FetchingData');
 ````
+This one line gives you the following for free:
+* A reducer for START_FETCHING_DATA and STOP_FETCHING_DATA actions
+* A selector for the current state: get.isFetchingData()(state)
+* An action creator to signal the beginning: act.startFetchingData()
+* An action creator to signal the end: act.stopFetchingData()
 
-How about if you need to keep track of the state of multiple async requests?
+What if you need to keep track of the state of multiple async requests?
 That's only a few more lines of code:
 
 ````js
-/* 
- * This will have the same action creators and selectors as above, except now
- * now their options will be required to include the property 'requestId', to
- * specify a unique branch of the tree: 
- *
- *  get.isFetchingData({ requestId: 42 })(state);
- *  act.startFetchingData({ requestId: 42 });
- *  act.stopFetchingData({ requestId: 42});
- */
 const { reducer, act, get } = keyedTree({
     keyName: 'requestId',
     subTree: durationTree('FetchingData');
 });
 ````
+This will have the same action creators and selectors as above, except now
+now their options will be required to include the property 'requestId', to
+specify a unique branch of the tree: 
+ *  get.isFetchingData({ requestId: 42 })(state);
+ *  act.startFetchingData({ requestId: 42 });
+ *  act.stopFetchingData({ requestId: 42});
 
 Mix and match to build complex state trees with very little code:
 ````js
@@ -115,6 +104,6 @@ const { reducer, get, act } = valueTree({
     selectorName  // optional, default: null
     actorName,    // optional, default: null
     valueName,    // optional, default: 'value'
-})
+});
 ````
 
