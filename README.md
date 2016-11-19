@@ -98,10 +98,10 @@ const ( reducer, act, get ) = branchedTree({
             keyName : 'y',
             subTree : keyedTree({
                 keyName : 'z',
-                subTree : valueTree('
+                subTree : valueTree({
                     selectorName : 'gridValue',
                     actorName    : 'setGridValue'
-                ')
+                })
             })
         })
     })
