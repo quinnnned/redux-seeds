@@ -1,10 +1,11 @@
-export default ({get, act}) => (connect) => (g2p, a2p, ...rest) => (
+export default ({get, act}) => (connect) => (g2p, a2p, merge, opts) => (
     connect(
         remap(g2p, get, (state, propValue) => propValue(state) ), 
         remap(a2p, act, (dispatch, propValue) => (
-            (...args) => dispatch(propValue(...args))
+            (options) => dispatch(propValue(options))
         )),
-        ...rest
+        merge,
+        opts
     )
 );
 
