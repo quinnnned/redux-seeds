@@ -1,82 +1,25 @@
-import supermock from '../lib/supermock';
+export default ({get, act}) => (connect) => (g2p, a2p, ...rest) => (
+    connect(
+        remap(g2p, get, (state, propValue) => propValue(state) ), 
+        remap(a2p, act, (dispatch, propValue) => (
+            (...args) => dispatch(propValue(...args))
+        )),
+        ...rest
+    )
+);
 
-
-export default (tree, doReflect = true) => (connect) => {
-
-    const treeConnect = (mapGetToProps, mapActToProps, mergeProps, options) => (
-        (Component) => {
-
-            if (doReflect) {
-                reflect(treeConnect, mapGetToProps, mapActToProps, Component );
-            }
-            
-            let mapStateToProps = undefined;
-            if (typeof mapGetToProps === 'function') {
-                mapStateToProps = (state, ownProps) => {
-                    const getProps = mapGetToProps(tree.get, ownProps);
-                    const propNames = Object.keys(getProps);
-                    const propCount = propNames.length;
-                    const props = {};
-                    for( let i = 0; i < propCount; i++) {
-                        const propName = propNames[i]; 
-                        props[propName] = getProps[propName](state);
-                    }
-                    return props;
-                };
-            }
-
-            let mapDispatchToProps = undefined;
-            if (typeof mapActToProps === 'function') {
-                mapDispatchToProps = (dispatch, ownProps) => {
-                    const actProps = mapActToProps(tree.act, ownProps);
-                    const propNames = Object.keys(actProps);
-                    const propCount = propNames.length;
-                    const props = {};
-                    for ( let i = 0; i < propCount; i++) {
-                        const propName = propNames[i];
-                        props[propName] = (...options) => (
-                            dispatch(actProps[propName](...options))
-                        );
-                    }
-                    return props;
-                };
-            }
-
-            return connect(
-                mapStateToProps, 
-                mapDispatchToProps, 
-                mergeProps, 
-                options
-            )(Component);
+const remap = (mapper, treePart, convertor) => {
+    if (typeof mapper != 'function') return undefined;
+    return (target, ownProps) => {
+        const mappedProps = mapper(treePart, ownProps);
+        const propNames = Object.keys(mappedProps);
+        const propCount = propNames.length;
+        const props = {};
+        for( let i = 0; i < propCount; i++) {
+            const propName = propNames[i];
+            const propValue = mappedProps[propName];
+            props[propName] = convertor(target, propValue);
         }
-    );
-
-    return treeConnect;
+        return props;
+    };
 };
-
-const reflect = (treeConnect, mapGetToProps, mapActToProps, Component) => {
-    const componentName = Component.displayName;
-    treeConnect._USAGE_ = treeConnect._USAGE_ || { get: [], act: [] };
-
-    const examine = (mapper, type) => {
-        if (typeof mapper === 'function') {
-            callAll(
-                mapper(
-                    new Proxy({}, {
-                        get: (target, property) => {
-                            treeConnect._USAGE_[type]
-                            .push([ componentName, property ]);
-                            return supermock;
-                        }
-                    }), 
-                    supermock
-                )
-            )    
-        }
-    } 
-    
-    examine( mapGetToProps, 'get');
-    examine( mapActToProps, 'act');
-};
-
-const callAll = (o) => Object.keys(o).forEach( (key) => o[key](supermock) );
