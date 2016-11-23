@@ -1,5 +1,21 @@
 import test from 'tape';
-import { keyedTree, durationTree, toggleTree } from '../src/';
+import { keyedTree, durationTree, toggleTree, blankTree } from '../src/';
+
+
+test('keyedTree', (assert) => {
+    const { reducer } = keyedTree({ subTree: blankTree() });
+    const state = {};
+    const action = {
+        type: 'SOME_ACTION',
+        payload: { /* no key */ }
+    }
+    assert.equal( reducer(state, action), state, `
+        should return previous state if the action has a non-null type and
+        is missing the key in its payload. 
+    `);
+
+    assert.end();
+});
 
 test('keyedTree: subTree', ({deepEqual, throws, doesNotThrow, equal, end}) => {
     
@@ -122,6 +138,53 @@ test('keyedTree: removeActorName', (assert) => {
 
     // cleanup
     console.error = originalConsoleError;
+    assert.end();
+});
+
+
+test('keyedTree: emptyActorName', (assert) => {
+
+    const { reducer, get, act } = keyedTree({
+        keyName: 'ship',
+        keysSelectorName: 'ships',
+        emptyActorName: 'destroyAllSpaceships',
+        subTree: durationTree('AbductingCows') 
+    });
+
+    assert.equal(typeof act.destroyAllSpaceships, 'function', `
+        should attach an actor to the tree for removing all keyed items
+    `);
+
+    const tester = (...actions) => (
+        get.ships()( actions.reduce( reducer, undefined ) ).length
+    );
+
+    assert.equal(
+        tester(
+            act.startAbductingCows({ship:'zorp'}),
+            act.startAbductingCows({ship:'gorp'}),
+            act.startAbductingCows({ship:'morp'}),
+            act.stopAbductingCows({ship:'zorp'}),
+            act.stopAbductingCows({ship:'gorp'}),
+            act.stopAbductingCows({ship:'morp'})    
+        ),
+        3
+    );
+
+    assert.equal(
+        tester(
+            act.startAbductingCows({ship:'zorp'}),
+            act.startAbductingCows({ship:'gorp'}),
+            act.startAbductingCows({ship:'morp'}),
+            act.stopAbductingCows({ship:'zorp'}),
+            act.stopAbductingCows({ship:'gorp'}),
+            act.stopAbductingCows({ship:'morp'}),
+            act.destroyAllSpaceships()
+        ),
+        0,
+        `should remove all keyed items from the state`
+    );
+
     assert.end();
 });
 

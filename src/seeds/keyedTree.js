@@ -5,8 +5,10 @@ export default ({
     subTree = null,
     keyName = 'key',
     removeActorName = null,
-    keysSelectorName = null
+    keysSelectorName = null,
+    emptyActorName = null
 } = {}) => {
+
     //// Validate options
     if (subTree === null) throw `"subTree" is a required option for keyedTree`;
 
@@ -18,6 +20,7 @@ export default ({
 
     //// Generate Action Types From Actor Names
     const REMOVE_ACTION_TYPE = camelToUpperSnake(removeActorName);
+    const EMPTY_ACTION_TYPE  = camelToUpperSnake(emptyActorName);
     
     //// Attach 'remove' actor if name is provided
     if (removeActorName) {
@@ -37,16 +40,30 @@ export default ({
             }
 
         } 
-    }
+    };
+
+    //// Attach 'empty' actor if name is provided
+    if (emptyActorName) {
+        tree.act[emptyActorName] = () => ({ 
+            type: EMPTY_ACTION_TYPE 
+        });
+    };
 
     //// Attach 'keys' selector if name is provided
     if (keysSelectorName) {
-        tree.get[keysSelectorName] = () => (state = defaultState) => Object.keys(state)
+        tree.get[keysSelectorName] = () => (state = defaultState) => (
+            Object.keys(state)
+        );
     }
 
     //// Define Reducer
     tree.reducer = (state = defaultState, action = {}) => {
         const {type = null, payload = {}, ...rest} = action;
+
+        if ( null === type) return state;
+
+        if ( EMPTY_ACTION_TYPE === type) return defaultState;
+
         const key = payload[keyName];
         if (key === undefined) return state;
 
