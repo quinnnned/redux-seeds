@@ -1,5 +1,6 @@
 import blankTree from './blankTree';
 import camelToUpperSnake from '../lib/camelToUpperSnake';
+import nameNormalizer from '../lib/nameNormalizer';
 
 /**
  * Creates a state tree for representing and updating a single value
@@ -13,6 +14,10 @@ export default ({
 
     //// Start with a blank tree
     const tree = blankTree();
+
+    //// Normalize Actor and Selector Names
+    actorName    = nameNormalizer(actorName);
+    selectorName = nameNormalizer(selectorName);
 
     //// Generate Action Type from actorName (if provided)
     const ACTION_TYPE = actorName && camelToUpperSnake(actorName);

@@ -243,3 +243,17 @@ test('keyedTree parameter validation', (assert) => {
     `);
     assert.end();
 });
+
+test('keyedTree selector/actor prefixes', (assert) => {
+    const {get, act} = keyedTree({
+        emptyActorName: 'act.emptyCollection',
+        removeActorName: 'act.removeItem',
+        keysSelectorName: 'get.itemIds',
+        subTree: blankTree()
+    });
+
+    assert.equal(typeof act.emptyCollection, 'function');
+    assert.equal(typeof act.removeItem, 'function');
+    assert.equal(typeof get.itemIds, 'function');
+    assert.end();
+});

@@ -1,4 +1,5 @@
 import camelToUpperSnake from '../lib/camelToUpperSnake';
+import nameNormalizer from '../lib/nameNormalizer';
 import customTree from './customTree';
 
 export default ({
@@ -7,12 +8,17 @@ export default ({
     onActorName = null,
     offActorName = null 
 }={}) => {
-    // Validate Inputs
+    //// Validate Inputs
     if ( selectorName === null) throw `"selectorName" is a required parameter for toggleTree seed.`
     if ( onActorName  === null) throw  `"onActorName" is a required parameter for toggleTree seed.`
     if ( offActorName === null) throw `"offActorName" is a required parameter for toggleTree seed.`
 
-    // Generate action type constants from actor names
+    //// Normalize Actor and Selector names
+    selectorName = nameNormalizer(selectorName);
+    offActorName = nameNormalizer(offActorName);
+    onActorName  = nameNormalizer(onActorName);
+
+    //// Generate action type constants from actor names
     const ON_ACTION_TYPE  = camelToUpperSnake(onActorName);
     const OFF_ACTION_TYPE = camelToUpperSnake(offActorName);
 

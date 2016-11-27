@@ -1,5 +1,6 @@
 import customTree from './customTree';
 import camelToUpperSnake from '../lib/camelToUpperSnake';
+import nameNormalizer from '../lib/nameNormalizer';
 
 export default ({
     subTree = null,
@@ -11,6 +12,11 @@ export default ({
 
     //// Validate options
     if (subTree === null) throw `"subTree" is a required option for keyedTree`;
+
+    //// Normalize Actor and Selector Names
+    keysSelectorName = nameNormalizer(keysSelectorName);
+    removeActorName  = nameNormalizer(removeActorName);
+    emptyActorName   = nameNormalizer(emptyActorName);
 
     //// The default state for keyedTree must always be an empty object
     const defaultState = {};

@@ -166,3 +166,16 @@ test('act.compose', ({equal, end}) => {
     equal( myTree.act.newActor(spies.options), spies.value, 'composed actor should have the standard actor signature: (options) => value')
     end();
 });
+
+test('toggleTree selector/actor prefixes', (assert) => {
+    const {get, act} = toggleTree({
+        onActorName  : 'act.markAsRead',
+        offActorName : 'act.markAsUnread',
+        selectorName : 'get.isRead',
+    });
+
+    assert.equal(typeof act.markAsRead, 'function');
+    assert.equal(typeof act.markAsUnread, 'function');
+    assert.equal(typeof get.isRead, 'function');
+    assert.end();
+});

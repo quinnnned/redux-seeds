@@ -194,3 +194,13 @@ test('valueTree reducer action validation', (assert) => {
     console.error = originalConsoleError;
     assert.end();
 });
+
+test('valueTree selector/actor prefixes', (assert) => {
+    const {get, act} = valueTree({
+        actorName    : 'act.setName',
+        selectorName : 'get.name'
+    });
+    assert.equal(typeof act.setName, 'function');
+    assert.equal(typeof get.name, 'function');
+    assert.end();
+});
