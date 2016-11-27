@@ -54,7 +54,7 @@ That's only a few more lines of code:
 ````js
 const { reducer, act, get } = keyedTree({
     keyName: 'requestId',
-    subTree: durationTree('FetchingData');
+    subTree: durationTree('FetchingData')
 });
 ````
 This will have the same actors and selectors as above, except now
@@ -69,7 +69,7 @@ Mix and match to build complex state trees with very little code:
 const ( reducer, act, get ) = branchedTree({
     isFetching: keyedTree({
         keyName : 'requestId',
-        subTree : durationTree('FetchingData');
+        subTree : durationTree('FetchingData')
     }),
     user: branchedTree({
         isAuthenticated: toggleTree({
