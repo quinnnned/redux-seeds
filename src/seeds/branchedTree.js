@@ -11,9 +11,8 @@ export default (branches) => {
 
         //// Attach Branch Selectors
         const branchGet = branches[branchName].get || {};
+        Object.assign(tree.get.composites, branchGet.composites);
         Object.keys(branchGet)
-            .filter( (selectorName) => selectorName != 'compose')
-            .filter( (selectorName) => selectorName != 'composites')
             .forEach( (selectorName) => {
                 const branchSelector = branchGet[selectorName];
                 tree.get[selectorName] = (options = {}) => (
@@ -22,12 +21,11 @@ export default (branches) => {
                     )  
                 );
             });
-
+            
         //// Attach Branch Actors
         const branchAct = branches[branchName].act || {};
+        Object.assign(tree.act.composites, branchAct.composites);
         Object.keys(branchAct)
-            .filter( (actorName) => actorName != 'compose')
-            .filter( (actorName) => actorName != 'composites')
             .forEach( (actorName) => {
                 const branchActor = branchAct[actorName];
                 tree.act[actorName] = (options = {}) => branchActor(options);

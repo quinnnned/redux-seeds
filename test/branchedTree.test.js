@@ -1,5 +1,5 @@
 import test from 'tape';
-import {branchedTree} from '../src';
+import {branchedTree, valueTree} from '../src';
 
 test('branchedTree type', (assert) => {
     assert.equal( typeof branchedTree, 'function', `
@@ -123,3 +123,25 @@ test('branchedTree actor composition', (assert) => {
     assert.end();
 });
 
+test('branchedTree .composites', (assert) => {
+    const a = valueTree({ defaultState: 2, selectorName: 'a' })
+    a.get.compose('a2', ({get}) => (
+        (options) => (state) => get.a()(state) * get.a()(state)
+    ));
+
+    const b = valueTree({ defaultState: 3, selectorName: 'b' })
+    b.get.compose('b2', ({get}) => (
+        (options) => (state) => get.b()(state) * get.b()(state)
+    ));
+
+    const c = branchedTree({a,b});
+    c.get.compose('sumOfSquares', ({get}) => (
+        (options) => (state) => get.a2()(state) + get.b2()(state)
+    ));
+
+    assert.equal(c.get.sumOfSquares()(), 13);
+    assert.equal(typeof c.get.composites.a2, 'function');
+    assert.equal(typeof c.get.composites.b2, 'function');
+    assert.equal(typeof c.get.composites.sumOfSquares, 'function');
+    assert.end();
+});
