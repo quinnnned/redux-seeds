@@ -153,19 +153,102 @@ Composite selectors get attached to `get.composites`, while composite actors
 ( of the form `(tree) => actor` ) get attached to `act.composites`.
 
 # Seed Documentation
++ All seeds have the form ``tree = seed(options)``, so the documentation below
+will focus on the options available for each seed.
+
++ All names for actors/selectors can be passed with a '``act.``' or '``get.``'
+prefix, respectively.  This is only there to make your code more
+self-documenting; these prefixes are ignored by the seeds.
+
 
 ## Value Tree
 Seed for a tree that represents a single value of any type.
+
+### Options:
++ ``defaultState``: (optional, ``string``, default: ``null``) If provided, specifies the
+state that will be filled-in if state is not provided to reducer or one of the 
+selectors.
+
++ ``selectorName``: (optional, ``string``, default: ``null``) If provided, a selector
+with this name will be attached to ``tree.get``.
+
++ ``actorName``: (optional, ``string``, default: ``null``) If provided, an actor with 
+this name will be attached to ``tree.act``.  This actor produces actions that
+can change the value represented by the resulting ``valueTree``. 
+
++ ``valueName``: (optional, ``string``, default: ``'value'``) Specifies the name of
+of the option that will be passed to the ``valueTree``'s actor and its action
+payload to specify the value to be changed.
+
+### Example:
+
 ````js
 import { valueTree } from 'redux-seeds';
 
 const { reducer, get, act } = valueTree({
-    defaultState, // optional, default: null
-    selectorName  // optional, default: null
-    actorName,    // optional, default: null
-    valueName,    // optional, default: 'value'
+    defaultState : 'Tuesday',
+    selectorName : 'get.dayOfTheWeek',
+    actorName    : 'act.setDayOfTheWeek',
+    valueName    : 'day'
 });
+
+get.dayOfTheWeek()();
+// 'Tuesday'
+
+const setDayToMondayAction = act.setDayOfTheWeek({ day: 'Monday' });
+// { type: 'SET_DAY_OF_THE_WEEK' payload: { day: 'Monday' } }
+
+const state = reducer(undefined, setDayToMondayAction);
+get.dayOfTheWeek()(state);
+// 'Monday'
+
 ````
+
+## Duration Tree
+Creates a tree that represents whether or not (``boolean``) an event of the 
+given description is taking place.  This type of tree is especially helpful for
+async events such as api calls or animations.
+
+### Options:  (required, ``string``, UpperCamelCase). 
+Unlike the other seeds, ``durationTree`` expects a single string value instead
+of an options object.  This string should be the UpperCamelCase description of
+an event, such as ``'RequestingData'`` or ``'FiringLasers'``.
+
+### Example:
+````js
+import { durationTree } from 'redux-seeds';
+
+const { reducer, get, act } = durationTree('SubmittingForm');
+
+get.isSubmittingForm()();
+// false
+
+const startAction = act.startSubmittingForm();
+// { type: 'START_SUBMITTING_FORM' }
+
+const stopAction = act.stopSubmittingForm();
+// { type: 'STOP_SUBMITTING_FORM' }
+
+let state = reducer(undefined, startAction);
+get.isSubmittingForm()(state);
+// true
+
+state = reducer(state, stopAction);
+get.isSubmittingForm()(state);
+// false
+````     
+
+## Toggle Tree
+Creates a tree to represent a scalar boolean value.
+
+## Custom Tree
+Creates a tree with custom handlers for each action type.
+
+## Keyed Tree
+Creates a tree for representing a dynamic, keyed collection of state branches.
+
+## Branched Tree
+This is the redux-seeds version of redux's ``combineReducers``.
 
 ## Blank Tree
 Seed for a basic tree. No selectors or actors. reducer is identity function and
@@ -175,3 +258,8 @@ import { blankTree } from 'redux-seeds';
 
 const { reducer, get, act } = blankTree();
 ````
+
+# Other Utilities
+
+## ``createTreeConnector()``
+
