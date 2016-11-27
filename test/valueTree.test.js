@@ -29,7 +29,7 @@ test('valueTree.get.[selectorName]', (assert) => {
     const testNoteA = `
         valueTree.get should initially just contain .compose and .composites
     `;
-    assert.equal( Object.keys(treeA.get).length, 2, testNoteA);
+    assert.equal( Object.keys(treeA.get).length, 0, testNoteA);
     assert.equal( typeof treeA.get.compose, 'function', testNoteA);
     assert.equal( typeof treeA.get.composites, 'object', testNoteA);
 
@@ -40,7 +40,7 @@ test('valueTree.get.[selectorName]', (assert) => {
         valueTree.get.[selectorName] should be a function if selectorName
         is provided in the options
     `;
-    assert.equal( Object.keys(treeB.get).length, 3, testNoteB);
+    assert.equal( Object.keys(treeB.get).length, 1, testNoteB);
     assert.equal( typeof treeB.get.thing, 'function', testNoteB);
     assert.equal( treeB.get.thing()(), null, testNoteB);
     assert.end();
@@ -51,7 +51,7 @@ test('valueTree.act.[actorName]', (assert) => {
     const testNoteA = `
         valueTree.act should initially just contain .compose and .composites
     `;
-    assert.equal( Object.keys(treeA.act).length, 2, testNoteA);
+    assert.equal( Object.keys(treeA.act).length, 0, testNoteA);
     assert.equal( typeof treeA.act.compose, 'function', testNoteA);
     assert.equal( typeof treeA.act.composites, 'object', testNoteA);
 
@@ -62,7 +62,7 @@ test('valueTree.act.[actorName]', (assert) => {
         valueTree.act.[actorName] should be a function if actorName
         is provided in the options
     `;
-    assert.equal( Object.keys(treeB.act).length, 3, testNoteB);
+    assert.equal( Object.keys(treeB.act).length, 1, testNoteB);
     assert.equal( typeof treeB.act.setUserName, 'function', testNoteB);
     assert.deepEqual( treeB.act.setUserName({ value: 'dave' }), {
         type: 'SET_USER_NAME',

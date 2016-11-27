@@ -1,27 +1,26 @@
 export default () => {
-
     const tree = {};
-
-    //// .reducer
-    tree.reducer = (state=null) => state;
-
-    //// .get
-    tree.get = { 
-        composites: {},
-        compose: (name, composite) => {
-            tree.get.composites[name] = composite;
-            tree.get[name] = composite(tree);
-        }
-    };
-
-    //// .act
-    tree.act = {
-        composites: {},
-        compose: (name, composite) => {
-            tree.act.composites[name] = composite;
-            tree.act[name] = composite(tree);
-        }
-    };
-
+    tree.reducer = (state = null) => state;
+    tree.get = composable(tree);
+    tree.act = composable(tree);
     return tree;
 }
+
+const composable = (root) => {
+    const composableObject = {}
+    attachNonEnumerable(composableObject, 'composites', {});
+    attachNonEnumerable(composableObject, 'compose', (name, composite) => {
+        composableObject.composites[name] = composite;
+        composableObject[name] = composite(root);
+    });
+    return composableObject;
+}
+
+const attachNonEnumerable = (object, propertyName, value) => (
+    Object.defineProperty(object, propertyName, {
+        enumerable: false,
+        configurable: false,
+        writable: false,
+        value
+    })
+);

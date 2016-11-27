@@ -35,13 +35,13 @@ test('toggleTree output: state tree structure', ({deepEqual, equal, end}) => {
 
     // .get
     equal(example.get == null, false, 'should have a "get" property');
-    deepEqual( Object.keys(example.get).length, 3, 'get should have exactly 3 properties' )
+    deepEqual( Object.keys(example.get).length, 1, 'get should have exactly 1 property' )
     equal(typeof example.get.exampleSelectorName, 'function', 'selector should be a function');
     equal(typeof example.get.exampleSelectorName(), 'function', 'selector should be a function factory');
 
     // .act
     equal(example.act == null, false, 'should have an "act" property');
-    deepEqual( Object.keys(example.act).length, 4, 'act should have exactly 4 properties');
+    deepEqual( Object.keys(example.act).length, 2, 'act should have exactly 2 properties');
     equal(typeof example.act.exampleOnActorName, 'function', 'on actor should be a function');
     equal(typeof example.act.exampleOffActorName, 'function', 'off actor should be a function');
 

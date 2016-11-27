@@ -14,13 +14,17 @@ test('blankTree output: state tree structure', ({deepEqual, equal, end}) => {
 
     // .get
     equal(tree.get == null, false, 'should have a "get" property');
-    deepEqual( Object.keys(tree.get).length, 2, 'get should have exactly two keys');
+    deepEqual( Object.keys(tree.get).length, 0, `
+        get.compose and get.composites should not be enumerable
+    `);
     deepEqual(tree.get.composites, {}, 'tree.get.composites should be an empty object');
     equal(typeof tree.get.compose, 'function', 'get.compose should be a function');
     
     // .act
     equal(tree.act == null, false, 'should have an "act" property');
-    deepEqual( Object.keys(tree.act).length, 2, 'act should have exactly two keys');
+    deepEqual( Object.keys(tree.act).length, 0, `
+        act.compose and act.composites should not be enumerable
+    `);
     deepEqual(tree.act.composites, {}, 'tree.act.composites should be an empty object');
     equal(typeof tree.act.compose, 'function', 'act.compose should be a function');
     
@@ -28,7 +32,6 @@ test('blankTree output: state tree structure', ({deepEqual, equal, end}) => {
     equal(typeof tree.reducer, 'function', 'should have a function "reducer" property');
     end();
 });
-
 
 test('blankTree.reducer', (assert) => {
 
@@ -104,11 +107,11 @@ test('get.compose order indifference', (assert) => {
     const tree = blankTree();
 
     tree.get.compose('fourth', ({get}) => (options) => (state) => (
-        get.first()(state) + get.second()(state) + get.third()(state) + '4'
+        get.third()(state) + '4'
     ));
 
     tree.get.compose('third', ({get}) => (options) => (state) => (
-        get.first()(state) + get.second()(state) + '3'
+        get.second()(state) + '3'
     ));
 
     tree.get.compose('second', ({get}) => (options) => (state) => (
@@ -117,7 +120,7 @@ test('get.compose order indifference', (assert) => {
 
     tree.get.first = () => () => '1';
     
-    assert.equal( tree.get.fourth()(), '11211234', `
+    assert.equal( tree.get.fourth()(), '1234', `
         the order that selectors are get.compose()'d does not matter;
         composite selectors can reference other selectors that have not yet been defined.
     `)
