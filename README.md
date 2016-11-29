@@ -263,3 +263,47 @@ const { reducer, get, act } = blankTree();
 
 ## ``createTreeConnector()``
 
+Extends the capabilities of react-redux's connect() function.  Instead of ``mapStateToProps`` and ``mapDispatchToProps``, you can directly access selectors (``mapGetToProps``) and actors (``mapActToProps``) without having to import them into your React component files.  In fact, the ``treeConnect`` function produced by ``createTreeConnector`` can be a complete abstraction layer between your ui and state.
+
+This encourages a stronger separation between ui and state, since the user can only directly use the available actors and selectors and no internal state details (tree structure, action types) will appear in your React components.
+
+As shown below, it is still possible to access ``state`` in mapGetToProps and it is still possible to access ``dispatch`` in mapActToProps (with redux-thunk), but the user must go out of her way to do so.
+
+To create a "tree connector":
+````js
+import {connect} from 'react-redux'
+import {createTreeConnector} from 'redux-seeds';
+import tree from '../state';
+
+// only has to be defined once
+export const treeConnect = createTreeConnector(tree)(connect);
+````
+
+To use:
+````js
+// Must return an object that maps prop names to functions of the form: (state) => value 
+const mapGetToProps = (get, ownProps) => ({
+    // Note that you use get.selector(options) and not get.selector(options)(state)
+    username: get.userName({userId: ownProps.id}),
+    
+    // Since each property is expected to be a function of state, you can still
+    // directly access state if necessary.  However, this is not the intended use.
+    favoriteColor: (state) => state.favoriteColorByUserId[ownProps.id]
+});
+
+// Must return an object that maps a given prop name to an actor (Action Creator)
+const mapActToProps = (act, ownProps) => ({
+    // Like this
+    onClickAdd: act.addUserToFriends({userId: ownProps.id}),
+    
+    // Or this:
+    onClickBack: act.navigateToMenu,
+    
+    // Or even this (with redux-thunk)
+    onClickMoreInfo: () => (dispatch) => { /* some async actions */ }
+});
+
+const SmartComponent = treeConnect(mapGetToProps, mapActToProps)(DumbComponent);
+````
+
+
