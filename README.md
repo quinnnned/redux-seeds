@@ -16,7 +16,7 @@ Seeds: Factories for Generating Common Redux State Trees
   + [``toggleTree``: represent a togglable boolean value](#toggle-tree)
   + [``customTree``: explicitly handle specific action types](#custom-tree)
   + [``keyedTree``: extend a scalar state tree to a keyed collection](#keyed-tree)
-  + [``branchedTree``: combine multiple state trees](#toggle-tree)
+  + [``branchedTree``: combine multiple state trees](#branched-tree)
 + [Utilities](#utilities)
   + [``createTreeConnector()``: connect React components to your state tree](#createtreeconnector)
 
