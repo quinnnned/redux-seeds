@@ -241,6 +241,46 @@ get.isSubmittingForm()(state);
 ## Toggle Tree
 Creates a tree to represent a scalar boolean value.
 
+### Options:
++ ``defaultState``: (optional, ``string``, default: ``false``) If provided, specifies the
+state that will be filled-in if state is not provided to reducer or one of the 
+selectors.  The value is false by default.
+
++ ``selectorName``: (optional, ``string``, default: ``null``) If provided, a selector
+with this name will be attached to ``tree.get``.  This selector returns the current state
+of the ``toggleTree`` (``true``/``false``)
+
++ ``onActorName``: (optional, ``string``, default: ``null``) If provided, an actor with 
+this name will be attached to ``tree.act``.  This actor produces an action that will "turn on"
+the ``toggleTree`` (set it to ``true``). 
+
++ ``offActorName``: (optional, ``string``, default: ``null``) If provided, an actor with 
+this name will be attached to ``tree.act``.  This actor produces an action that will "turn off"
+the ``toggleTree`` (set it to ``false``).
+
+### Example:
+````js
+import {toggleTree} from 'redux-seeds';
+
+const { reducer, get, act } = toggleTree({
+    defaultState : true,
+    selectorName : 'get.isPlayerAlive',
+    offActorName : 'act.killPlayer',
+    onActorName  : 'act.revivePlayer'
+});
+
+get.isPlayerAlive()();
+// true
+
+const deadState = reducer(undefined, act.killPLayer());
+get.isPlayerAlive()(deadState);
+// false
+
+const revivedState = reducer(deadState, act.revivePlayer());
+get.isPlayerAlive()(revivedState);
+// true
+````
+
 ## Custom Tree
 Creates a tree with custom handlers for each action type.
 
