@@ -7,6 +7,19 @@ Seeds: Factories for Generating Common Redux State Trees
 
 *NOTE: This library uses the word "Actor" as a shorthand for "Action Creator"*
 
++ [State Tree Proposal](#state-tree-proposal)
++ [Redux Seeds](#redux-seeds-1)
++ [Simplified Unit Testing](#simplified-unit-testing-composite-actors--selectors)
++ [Seed Documentation](#seed-documentation)
+  + [``valueTree``: represent a basic value](#value-tree)
+  + [``durationTree``: represent if an event is happening](#duration-tree)
+  + [``toggleTree``: represent a togglable boolean value](#toggle-tree)
+  + [``customTree``: explicitly handle specific action types](#custom-tree)
+  + [``keyedTree``: extend a scalar state tree to a keyed collection](#keyed-tree)
+  + [``branchedTree``: combine multiple state trees](#toggle-tree)
++ [Utilities](#utilities)
+  + [``createTreeConnector()``: connect React components to your state tree](#createtreeconnector)
+
 # State Tree Proposal
 
 Large Redux stores can be tricky to organize, difficult to change, and can
@@ -299,7 +312,7 @@ import { blankTree } from 'redux-seeds';
 const { reducer, get, act } = blankTree();
 ````
 
-# Other Utilities
+# Utilities
 
 ## ``createTreeConnector()``
 
