@@ -11,15 +11,15 @@ Seeds: Factories for Generating Common Redux State Trees
 + [Redux Seeds](#redux-seeds-1)
 + [Simplified Unit Testing](#simplified-unit-testing-composite-actors--selectors)
 + [Seed Documentation](#seed-documentation)
-  + [``valueTree``: represent a basic value](#value-tree)
-  + [``durationTree``: represent if an event is happening](#duration-tree)
-  + [``toggleTree``: represent a togglable boolean value](#toggle-tree)
-  + [``customTree``: explicitly handle specific action types](#custom-tree)
-  + [``keyedTree``: extend a scalar state tree to a keyed collection](#keyed-tree)
-  + [``branchedTree``: combine multiple state trees](#branched-tree)
-  + [``blankTree``: make your own seeds!](#blank-tree)
+  + [`valueTree`: represent a basic value](#value-tree)
+  + [`durationTree`: represent if an event is happening](#duration-tree)
+  + [`toggleTree`: represent a togglable boolean value](#toggle-tree)
+  + [`customTree`: explicitly handle specific action types](#custom-tree)
+  + [`keyedTree`: extend a scalar state tree to a keyed collection](#keyed-tree)
+  + [`branchedTree`: combine multiple state trees](#branched-tree)
+  + [`blankTree`: make your own seeds!](#blank-tree)
 + [Utilities](#utilities)
-  + [``createTreeConnector()``: connect React components to your state tree](#createtreeconnector)
+  + [`createTreeConnector()`: connect React components to your state tree](#createtreeconnector)
 
 # State Tree Proposal
 
@@ -30,7 +30,7 @@ The State Tree Pattern solves all of these issues.
 
 A *State Tree* is a JavaScript object with the following structure:
 
-```` js
+``` js
 const tree = {
     reducer: /* The usual redux reducer */,
     act: { 
@@ -46,16 +46,16 @@ const tree = {
         */ 
     } 
 }
-````
+```
 
 # Redux Seeds
 A seed is a factory function that returns a specific type of state tree.
 
 For example, need a part of your state tree that represents whether or not some
 async event is occuring? That's one line of code with the durationTree seed:
-````js
+```js
 const { reducer, act, get } = durationTree('FetchingData');
-````
+```
 This one line gives you the following for free:
 * A reducer for START_FETCHING_DATA and STOP_FETCHING_DATA actions
 * A selector for the current state: get.isFetchingData()(state)
@@ -65,12 +65,12 @@ This one line gives you the following for free:
 What if you need to keep track of the state of multiple async requests?
 That's only a few more lines of code:
 
-````js
+```js
 const { reducer, act, get } = keyedTree({
     keyName: 'requestId',
     subTree: durationTree('FetchingData')
 });
-````
+```
 This will have the same actors and selectors as above, except now
 now their options will be required to include the property 'requestId', to
 specify a unique branch of the tree: 
@@ -79,7 +79,7 @@ specify a unique branch of the tree:
  *  act.stopFetchingData({ requestId: 42});
 
 Mix and match to build complex state trees with very little code:
-````js
+```js
 const ( reducer, act, get ) = branchedTree({
     isFetching: keyedTree({
         keyName : 'requestId',
@@ -110,14 +110,14 @@ const ( reducer, act, get ) = branchedTree({
         })
     })
 });
-````
+```
 # Simplified Unit Testing: Composite Actors & Selectors
 
 All trees produced by redux-seeds have get.compose() and act.compose() methods,
 which can be used to create higher-order selectors and actors, respectively.
 
 For example, this ...
-````js
+```js
 /* 
  * get.compose() takes a string selector name and a composite selector of the
  * form: (tree) => selector, that is, (tree) => (options) => (state) => value
@@ -126,11 +126,11 @@ get.compose('numbersAboveThreshold', (tree) => (options) => (state) => (
     tree.get.numbers()(state)
         .filter( (n) => n > tree.get.threshold()(state) )
 ));
-````
+```
 
 ... can be tested like this:
 
-````js
+```js
 import test from 'tape';
 import {get} from 'path/to/state';
 
@@ -156,7 +156,7 @@ test('get.numbersAboveThreshold selector', (assert) => {
     `);
     assert.end();
 });
-````
+```
 The `(tree) => selector` format of composites allow mock versions of primary 
 selectors (get.numbers, get.threshold) to be injected, which removes the need 
 to set up a dummy state for the selector.  The internal behavior of the primary
@@ -167,10 +167,10 @@ Composite selectors get attached to `get.composites`, while composite actors
 ( of the form `(tree) => actor` ) get attached to `act.composites`.
 
 # Seed Documentation
-+ All seeds have the form ``tree = seed(options)``, so the documentation below
++ All seeds have the form `tree = seed(options)`, so the documentation below
 will focus on the options available for each seed.
 
-+ All names for actors/selectors can be passed with a '``act.``' or '``get.``'
++ All names for actors/selectors can be passed with an '`act.`' or '`get.`'
 prefix, respectively.  This is only there to make your code more
 self-documenting; these prefixes are ignored by the seeds.
 
@@ -179,24 +179,24 @@ self-documenting; these prefixes are ignored by the seeds.
 Seed for a tree that represents a single value of any type.
 
 ### Options:
-+ ``defaultState``: (optional, ``string``, default: ``null``) If provided, specifies the
++ `defaultState`: (optional, `string`, default: `null`) If provided, specifies the
 state that will be filled-in if state is not provided to reducer or one of the 
 selectors.
 
-+ ``selectorName``: (optional, ``string``, default: ``null``) If provided, a selector
-with this name will be attached to ``tree.get``.
++ `selectorName`: (optional, `string`, default: `null`) If provided, a selector
+with this name will be attached to `tree.get`.
 
-+ ``actorName``: (optional, ``string``, default: ``null``) If provided, an actor with 
-this name will be attached to ``tree.act``.  This actor produces actions that
-can change the value represented by the resulting ``valueTree``. 
++ `actorName`: (optional, `string`, default: `null`) If provided, an actor with 
+this name will be attached to `tree.act`.  This actor produces actions that
+can change the value represented by the resulting `valueTree`. 
 
-+ ``valueName``: (optional, ``string``, default: ``'value'``) Specifies the name of
-of the option that will be passed to the ``valueTree``'s actor and its action
++ `valueName`: (optional, `string`, default: `'value'`) Specifies the name of
+of the option that will be passed to the `valueTree`'s actor and its action
 payload to specify the value to be changed.
 
 ### Example:
 
-````js
+```js
 import { valueTree } from 'redux-seeds';
 
 const { reducer, get, act } = valueTree({
@@ -216,20 +216,20 @@ const state = reducer(undefined, setDayToMondayAction);
 get.dayOfTheWeek()(state);
 // 'Monday'
 
-````
+```
 
 ## Duration Tree
-Creates a tree that represents whether or not (``boolean``) an event of the 
+Creates a tree that represents whether or not (`boolean`) an event of the 
 given description is taking place.  This type of tree is especially helpful for
 async events such as api calls or animations.
 
-### Options:  (required, ``string``, UpperCamelCase). 
-Unlike the other seeds, ``durationTree`` expects a single string value instead
+### Options:  (required, `string`, UpperCamelCase). 
+Unlike the other seeds, `durationTree` expects a single string value instead
 of an options object.  This string should be the UpperCamelCase description of
-an event, such as ``'RequestingData'`` or ``'FiringLasers'``.
+an event, such as `'RequestingData'` or `'FiringLasers'`.
 
 ### Example:
-````js
+```js
 import { durationTree } from 'redux-seeds';
 
 const { reducer, get, act } = durationTree('SubmittingForm');
@@ -250,30 +250,30 @@ get.isSubmittingForm()(state);
 state = reducer(state, stopAction);
 get.isSubmittingForm()(state);
 // false
-````     
+```    
 
 ## Toggle Tree
 Creates a tree to represent a scalar boolean value.
 
 ### Options:
-+ ``defaultState``: (optional, ``string``, default: ``false``) If provided, specifies the
++ `defaultState`: (optional, `string`, default: `false`) If provided, specifies the
 state that will be filled-in if state is not provided to reducer or one of the 
 selectors.  The value is false by default.
 
-+ ``selectorName``: (optional, ``string``, default: ``null``) If provided, a selector
-with this name will be attached to ``tree.get``.  This selector returns the current state
-of the ``toggleTree`` (``true``/``false``)
++ `selectorName`: (optional, `string`, default: `null`) If provided, a selector
+with this name will be attached to `tree.get`.  This selector returns the current state
+of the `toggleTree` (`true` / `false`)
 
-+ ``onActorName``: (optional, ``string``, default: ``null``) If provided, an actor with 
-this name will be attached to ``tree.act``.  This actor produces an action that will "turn on"
-the ``toggleTree`` (set it to ``true``). 
++ `onActorName`: (optional, `string`, default: `null`) If provided, an actor with 
+this name will be attached to `tree.act`.  This actor produces an action that will "turn on"
+the `toggleTree` (set it to `true`). 
 
-+ ``offActorName``: (optional, ``string``, default: ``null``) If provided, an actor with 
-this name will be attached to ``tree.act``.  This actor produces an action that will "turn off"
-the ``toggleTree`` (set it to ``false``).
++ `offActorName`: (optional, `string`, default: `null`) If provided, an actor with 
+this name will be attached to `tree.act`.  This actor produces an action that will "turn off"
+the `toggleTree` (set it to `false`).
 
 ### Example:
-````js
+```js
 import {toggleTree} from 'redux-seeds';
 
 const { reducer, get, act } = toggleTree({
@@ -293,7 +293,7 @@ get.isPlayerAlive()(deadState);
 const revivedState = reducer(deadState, act.revivePlayer());
 get.isPlayerAlive()(revivedState);
 // true
-````
+```
 
 ## Custom Tree
 Creates a tree with custom handlers for each action type.
@@ -302,39 +302,39 @@ Creates a tree with custom handlers for each action type.
 Creates a tree for representing a dynamic, keyed collection of state branches.
 
 ## Branched Tree
-This is the redux-seeds version of redux's ``combineReducers``.
+This is the redux-seeds version of redux's `combineReducers`.
 
 ## Blank Tree
 Seed for a basic tree. No selectors or actors. reducer is identity function and
 returns null by default.  
-````js
+```js
 import { blankTree } from 'redux-seeds';
 
 const { reducer, get, act } = blankTree();
-````
+```
 
 # Utilities
 
-## ``createTreeConnector()``
+## `createTreeConnector()`
 
-Extends the capabilities of react-redux's connect() function.  Instead of ``mapStateToProps`` and ``mapDispatchToProps``, you can directly access selectors (``mapGetToProps``) and actors (``mapActToProps``) without having to import them into your React component files.  In fact, the ``treeConnect`` function produced by ``createTreeConnector`` can be a complete abstraction layer between your ui and state.
+Extends the capabilities of react-redux's connect() function.  Instead of `mapStateToProps` and `mapDispatchToProps`, you can directly access selectors (`mapGetToProps`) and actors (`mapActToProps`) without having to import them into your React component files.  In fact, the `treeConnect` function produced by `createTreeConnector` can be a complete abstraction layer between your ui and state.
 
 This encourages a stronger separation between ui and state, since the user can only directly use the available actors and selectors and no internal state details (tree structure, action types) will appear in your React components.
 
-As shown below, it is still possible to access ``state`` in mapGetToProps and it is still possible to access ``dispatch`` in mapActToProps (with redux-thunk), but the user must go out of her way to do so.
+As shown below, it is still possible to access `state` in mapGetToProps and it is still possible to access `dispatch` in mapActToProps (with redux-thunk), but the user must go out of her way to do so.
 
 To create a "tree connector":
-````js
+```js
 import {connect} from 'react-redux'
 import {createTreeConnector} from 'redux-seeds';
 import tree from '../state';
 
 // only has to be defined once
 export const treeConnect = createTreeConnector(tree)(connect);
-````
+```
 
 To use:
-````js
+```js
 // Must return an object that maps prop names to functions of the form: (state) => value 
 const mapGetToProps = (get, ownProps) => ({
     // Note that you use get.selector(options) and not get.selector(options)(state)
@@ -358,6 +358,6 @@ const mapActToProps = (act, ownProps) => ({
 });
 
 const SmartComponent = treeConnect(mapGetToProps, mapActToProps)(DumbComponent);
-````
+```
 
 
