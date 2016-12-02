@@ -87,13 +87,13 @@ const ( reducer, act, get ) = branchedTree({
     }),
     user: branchedTree({
         isAuthenticated: toggleTree({
-            selectorName : 'isUserAuthenticated',
-            onActorName  : 'authenticateUser',
-            offActorName : 'deAuthenticateUser'  
+            selectorName : 'get.isUserAuthenticated',
+            offActorName : 'act.deAuthenticateUser',
+            onActorName  : 'act.authenticateUser'
         }),
         name: valueTree({
-            selectorName : 'userName',
-            actorName    : 'setUserName'
+            actorName    : 'act.setUserName'
+            selectorName : 'get.userName',
         })
     }),
     grid3d: keyedTree({
@@ -103,8 +103,8 @@ const ( reducer, act, get ) = branchedTree({
             subTree : keyedTree({
                 keyName : 'z',
                 subTree : valueTree({
-                    selectorName : 'gridValue',
-                    actorName    : 'setGridValue'
+                    actorName    : 'act.setGridValue',
+                    selectorName : 'get.gridValue'
                 })
             })
         })
