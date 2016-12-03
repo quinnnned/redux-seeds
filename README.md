@@ -132,7 +132,7 @@ get.compose('numbersAboveThreshold', (tree) => (options) => (state) => (
 
 ```js
 import test from 'tape';
-import {get} from 'path/to/state';
+import { get } from 'path/to/state';
 
 test('get.numbersAboveThreshold selector', (assert) => {
     // Arrange (inject mock tree with mock selectors)
@@ -274,7 +274,7 @@ the `toggleTree` (set it to `false`).
 
 ### Example:
 ```js
-import {toggleTree} from 'redux-seeds';
+import { toggleTree } from 'redux-seeds';
 
 const { reducer, get, act } = toggleTree({
     defaultState : true,
@@ -308,7 +308,7 @@ selectors.  The value is false by default.
 ### Example:
 
 ```js
-import {customTree} from 'redux-seeds';
+import { customTree } from 'redux-seeds';
 
 const mod = (q,d) => (q%d+d)%d // because js does modulo wrong
 
@@ -362,8 +362,8 @@ As shown below, it is still possible to access `state` in mapGetToProps and it i
 
 To create a "tree connector":
 ```js
-import {connect} from 'react-redux'
-import {createTreeConnector} from 'redux-seeds';
+import { connect } from 'react-redux'
+import { createTreeConnector } from 'redux-seeds';
 import tree from '../state';
 
 // only has to be defined once
