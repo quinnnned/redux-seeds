@@ -179,7 +179,7 @@ self-documenting; these prefixes are ignored by the seeds.
 Seed for a tree that represents a single value of any type.
 
 ### Options:
-+ `defaultState`: (optional, `string`, default: `null`) If provided, specifies the
++ `defaultState`: (optional, `any`, default: `null`) If provided, specifies the
 state that will be filled-in if state is not provided to reducer or one of the 
 selectors.
 
@@ -256,7 +256,7 @@ get.isSubmittingForm()(state);
 Creates a tree to represent a scalar boolean value.
 
 ### Options:
-+ `defaultState`: (optional, `string`, default: `false`) If provided, specifies the
++ `defaultState`: (optional, `boolean`, default: `false`) If provided, specifies the
 state that will be filled-in if state is not provided to reducer or one of the 
 selectors.  The value is false by default.
 
@@ -296,7 +296,41 @@ get.isPlayerAlive()(revivedState);
 ```
 
 ## Custom Tree
-Creates a tree with custom handlers for each action type.
+Creates a tree with custom reducers for each action type.  This is a great choice for creating a tree that has complex behavior not covered by any of the other seeds.  If you use this tree, you'll have to attach your own actors and selectors to `act.` and `get.`, but you'll also get `get.compose` and `act.compose` for free!   
+
+### Options:
++ `defaultState`: (optional, `any`, default: `null`) If provided, specifies the
+state that will be filled-in if state is not provided to reducer or one of the 
+selectors.  The value is false by default.
+
++ `actionHandlers`: (optional, `object`, default: `{}`) An object that maps a given action type to a custom reducer for that action type. Actions with types not explicitly handled by these reducers have no effect on the state of this tree.
+
+### Example:
+
+```js
+import {customTree} from 'redux-seeds';
+
+const mod = (q,d) => (q%d+d)%d // because js does modulo wrong
+
+const { reducer, act, get } = customTree({
+    defaultState: 0,
+    actionHandlers: {
+        ROTATE: (state, action) => mod(state + action.payload.degrees, 360)
+    }
+});
+
+reducer();
+// 0
+
+reducer(0, { type: "ROTATE", payload: { degrees: 45 } } );
+// 45
+
+reducer(0, { type: "ROTATE", payload: { degrees: 450 } } );
+// 270
+
+reducer(0, { type: "ROTATE", payload: { degrees: -45 } } );
+// 315
+```
 
 ## Keyed Tree
 Creates a tree for representing a dynamic, keyed collection of state branches.
