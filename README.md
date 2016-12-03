@@ -312,23 +312,26 @@ import {customTree} from 'redux-seeds';
 
 const mod = (q,d) => (q%d+d)%d // because js does modulo wrong
 
+cosnt defaultState = 0;
 const { reducer, act, get } = customTree({
-    defaultState: 0,
+    defaultState,
     actionHandlers: {
         ROTATE: (state, action) => mod(state + action.payload.degrees, 360)
     }
 });
+get.angle  = () => (state = defaultState) => state;
+act.rotate = ({degrees}) => ({ type: "ROTATE", payload: {degrees} });
 
 reducer();
 // 0
 
-reducer(0, { type: "ROTATE", payload: { degrees: 45 } } );
+reducer(0,  act.rotate({degrees: 45}) );
 // 45
 
-reducer(0, { type: "ROTATE", payload: { degrees: 450 } } );
+reducer(0,  act.rotate({degrees: 450}) );
 // 270
 
-reducer(0, { type: "ROTATE", payload: { degrees: -45 } } );
+reducer(0,  act.rotate({degrees: -45}) );
 // 315
 ```
 
