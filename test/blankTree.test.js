@@ -127,3 +127,37 @@ test('get.compose order indifference', (assert) => {
 
     assert.end();
 });
+
+test('get.compose prefixes', (assert) => {
+
+    const {get} = blankTree();
+
+    get.compose('get.withPrefix', (tree) => (options) => (state) => state)
+
+    assert.equal(typeof get["get.withPrefix"], 'undefined', `
+        should ignore get. prefix
+    `)
+
+    assert.equal(typeof get.withPrefix, 'function', `
+        should set selector based on text after get. prefix   
+    `)
+
+    assert.end();
+});
+
+test('act.compose prefixes', (assert) => {
+
+    const {act} = blankTree();
+
+    act.compose('act.withPrefix', (tree) => (options) => ({}) )
+
+    assert.equal(typeof act["act.withPrefix"], 'undefined', `
+        should ignore act. prefix
+    `)
+
+    assert.equal(typeof act.withPrefix, 'function', `
+        should set selector based on text after act. prefix   
+    `)
+
+    assert.end();
+});

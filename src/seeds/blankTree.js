@@ -1,3 +1,5 @@
+import nameNormalizer from '../lib/nameNormalizer'; 
+
 export default () => {
     const tree = {};
     tree.reducer = (state = null) => state;
@@ -10,8 +12,9 @@ const composable = (root) => {
     const composableObject = {}
     attachNonEnumerable(composableObject, 'composites', {});
     attachNonEnumerable(composableObject, 'compose', (name, composite) => {
-        composableObject.composites[name] = composite;
-        composableObject[name] = composite(root);
+        const normalizedName = nameNormalizer(name);
+        composableObject.composites[normalizedName] = composite;
+        composableObject[normalizedName] = composite(root);
     });
     return composableObject;
 }
