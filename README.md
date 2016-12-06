@@ -69,14 +69,14 @@ const { reducer, act, get } = keyedTree({
     keyName: 'requestId',
     subTree: durationTree('FetchingData')
 });
-```
 
-This will have the same actors and selectors as above, except now
-now their options will be required to include the property 'requestId', to
-specify a unique branch of the tree: 
- *  `get.isFetchingData({ requestId: 42 })(state);`
- *  `act.startFetchingData({ requestId: 42 });`
- *  `act.stopFetchingData({ requestId: 42 });`
+const start42 = act.startFetchingData({ requestId: 42 });
+// { type: "START_FETCHING_DATA", payload: { requestId: 42 } }
+
+const state = reducer(undefined, start42);
+get.isFetchingData({ requestId: 42 })(state); // true
+get.isFetchingDate({ requestId: 24 })(state); // false (each request is isolated)
+```
 
 Mix and match to build complex state trees with very little code:
 ```js
