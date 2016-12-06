@@ -49,7 +49,7 @@ const tree = {
 ```
 
 # Redux Seeds
-A seed is a factory function that returns a specific type of state tree.
+A seed is a factory function that returns a specific type of state tree.  You can use them as much or as little as you want to help you build and maintain your state tree; no need to do a rewrite in order to take advantage of this library.
 
 For example, need a part of your state tree that represents whether or not some
 async event is occuring? That's one line of code with the durationTree seed:
@@ -58,25 +58,25 @@ const { reducer, act, get } = durationTree('FetchingData');
 ```
 This one line gives you the following for free:
 * A reducer for START_FETCHING_DATA and STOP_FETCHING_DATA actions
+    * `redux-seeds` will auto-generate action type constants by converting the lowerCamelCase actor names to UPPER_SNAKE_CASE.
 * A selector for the current state: get.isFetchingData()(state)
 * An actor to signal the beginning: act.startFetchingData()
 * An actor to signal the end: act.stopFetchingData()
 
-What if you need to keep track of the state of multiple async requests?
-That's only a few more lines of code:
-
+What if you need to keep track of the state of multiple async requests? Easy! Just wrap your `durationTree` with a `keyedTree`:
 ```js
 const { reducer, act, get } = keyedTree({
     keyName: 'requestId',
     subTree: durationTree('FetchingData')
 });
 ```
+
 This will have the same actors and selectors as above, except now
 now their options will be required to include the property 'requestId', to
 specify a unique branch of the tree: 
- *  get.isFetchingData({ requestId: 42 })(state);
- *  act.startFetchingData({ requestId: 42 });
- *  act.stopFetchingData({ requestId: 42});
+ *  `get.isFetchingData({ requestId: 42 })(state);`
+ *  `act.startFetchingData({ requestId: 42 });`
+ *  `act.stopFetchingData({ requestId: 42 });`
 
 Mix and match to build complex state trees with very little code:
 ```js
@@ -174,7 +174,6 @@ will focus on the options available for each seed.
 prefix, respectively.  This is only there to make your code more
 self-documenting; these prefixes are ignored by the seeds.
 
-
 ## Value Tree
 Seed for a tree that represents a single value of any type.
 
@@ -215,7 +214,6 @@ const setDayToMondayAction = act.setDayOfTheWeek({ day: 'Monday' });
 const state = reducer(undefined, setDayToMondayAction);
 get.dayOfTheWeek()(state);
 // 'Monday'
-
 ```
 
 ## Duration Tree
