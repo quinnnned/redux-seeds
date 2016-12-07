@@ -336,11 +336,93 @@ reducer(0, act.rotate({degrees: -45}) );
 // 315
 ```
 
-## Keyed Tree
-Creates a tree for representing a dynamic, keyed collection of state branches.
-
 ## Branched Tree
 This is the redux-seeds version of redux's `combineReducers`.
+
+(more documentation to come)
+
+## Keyed Tree
+*NOTE: The `keyedTree` requires a lot of documentation in order to be perfeclty clear about what it does, but it's conceptually very simple.  Be sure to check out the example below.*
+
+Creates a tree for representing a dynamic, keyed collection of state trees. This seed takes the reducer, actors, and selectors of its `subTree` and augments each with keyed functionality.  Any kind of state tree can be used as the `subTree` for the `keyedTree`, even a complex `branchedTree` or another `keyedTree`.
+
++ The keyed version of each actor will:
+  + Complain if the key is not present in the `options` object. 
+  + Include the state key (under the property name specified by `keyName`, default `'key'`) in the action payload
++ The keyed version of each selector will:
+  + Complain if the key is not present in the `options` object.
+  + Pass the state branch for the provided key to the original selector  
++ The keyed version of the reducer will:
+  + Ignore actions if the key is not present in the `actions.payload` object.
+  + Update the selected state branch by passing the state branch for the provided key and the action to the original reducer
+  + (optional) Reduce "remove" events, which remove a given key's state branch
+  + (optional) Reduce "empty" events, which remove all the keyed state branches, resetting the collection
+    
+### Options:
++ `subTree`: (required, `state tree`) The state tree to be augmented with keyed functionality.  One way to think about the keyed tree would be as a group of independent copies of this `subTree`, each with a unique key.
+
++ `keyName`: (optional, `string`, default `'key'`) Defines the property name that will be used when actors, selectors and the reducer are expecting a key from an options or action payload object.  This is particularly useful when nesting multiple levels of `keyedTree`s, since otherwise the `keyName`s would collide with the default value of `'key'`.
+
++ `keysSelectorName`: (optional, `string`, default null) If provided, a selector with this name will be attached to `tree.get`. This selector returns an array containing every key in use by the keyedTree.
+
++ `removeActorName`: (optional, `string`, default null) If provided, an actor with this name will be attached to `tree.act`.  This actor requires its `options` parameter to contain a specific key and produces an action that can remove the specific key and its state branch from the `keyedTree`
+
++ `emptyActorName`: (optional, `string`, default null) If provided, an actor with this name will be attached to `tree.act`.  This actor produces an action that can removes all keys from the `keyedTree`, emptying the collection.
+
+### Example:
+Demonstrating all the things that keyedTree handles for you inevitably requires a lengthy example.  Hopefully the succinctness of the design code (relative to what it designs) will demonstrate the power of this seed.
+
+```js
+
+// Create a tree to represent a collection of employees with names and status
+const { reducer, act, get } = keyedTree({
+    keyName          : 'employeeId',
+    keysSelectorName : 'get.allEmployeeIds',
+    removeActorName  : 'act.fireEmployee',
+    emptyActorName   : 'act.fireEveryone',
+   
+    // Define a subtree to represent a single employee
+    subTree: branchedTree({
+        fullname: valueTree({
+            valueName    : 'fullname', 
+            selectorName : 'get.employeeFullName',
+            actorName    : 'act.setEmployeeFullName'
+        }),
+        isActive: toggleTree({
+            defaultState : false,
+            selectorName : 'get.isEmployeeActive',
+            onActorName  : 'act.hireEmployee',
+            offActorName : 'act.suspendEmployee'
+        })  
+    })
+});
+
+const state = [
+    // Hire Dave
+    act.hireEmployee({ employeeId: 'dave1234' }), 
+    
+    // Set Dave's Name
+    act.setEmployeeFullName({ employeeId: 'dave1234', fullname: 'Dave King' }),
+    
+    // Hire Mike
+    act.hireEmployee({ employeeId: 'mike0000' }), 
+    
+    // Set Mike's Name
+    act.setEmployeeFullName({ employeeId: 'mike0000', fullname: 'Mike Wells' }),
+    
+    // Fire Dave
+    act.fireEmployee({ employeeId: 'dave1234' })
+    
+].reduce(reducer, undefined);
+
+// Mike is still hired, Dave is not
+get.isEmployeeActive({ employeeId: 'dave1234' })(state); // false
+get.isEmployeeActive({ employeeId: 'mike0000' })(state); // true
+
+// Uh oh... Downsizing
+const state2 = reducer(state, act.fireEveryone() )
+get.isEmployeeActive({ employeeId: 'mike0000' })(state2); // false
+```
 
 ## Blank Tree
 Seed for a basic tree. No selectors or actors. reducer is identity function and
