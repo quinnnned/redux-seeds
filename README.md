@@ -363,25 +363,25 @@ Creates a tree for representing a dynamic, keyed collection of state trees. This
 
 + `keyName`: (optional, `string`, default `'key'`) Defines the property name that will be used when actors, selectors and the reducer are expecting a key from an options or action payload object.  This is particularly useful when nesting multiple levels of `keyedTree`s, since otherwise the `keyName`s would collide with the default value of `'key'`.
 
-+ `keysSelectorName`: (optional, `string`, default null) If provided, a selector with this name will be attached to `tree.get`. This selector returns an array containing every key in use by the keyedTree.
++ `keysSelectorName`: (optional, `string`, default `null`) If provided, a selector with this name will be attached to `tree.get`. This selector returns an array containing every key in use by the keyedTree.
 
-+ `removeActorName`: (optional, `string`, default null) If provided, an actor with this name will be attached to `tree.act`.  This actor requires its `options` parameter to contain a specific key and produces an action that can remove the specific key and its state branch from the `keyedTree`
++ `removeActorName`: (optional, `string`, default `null`) If provided, an actor with this name will be attached to `tree.act`.  This actor requires its `options` parameter to contain a specific key and produces an action that can remove the specific key and its state branch from the `keyedTree`
 
-+ `emptyActorName`: (optional, `string`, default null) If provided, an actor with this name will be attached to `tree.act`.  This actor produces an action that can removes all keys from the `keyedTree`, emptying the collection.
++ `emptyActorName`: (optional, `string`, default `null`) If provided, an actor with this name will be attached to `tree.act`.  This actor produces an action that can removes all keys from the `keyedTree`, emptying the collection.
 
 ### Example:
 Demonstrating all the things that keyedTree handles for you inevitably requires a lengthy example.  Hopefully the succinctness of the design code (relative to what it designs) will demonstrate the power of this seed.
 
 ```js
 
-// Create a tree to represent a collection of employees with names and status
+// A tree to represent a collection of employees
 const { reducer, act, get } = keyedTree({
     keyName          : 'employeeId',
     keysSelectorName : 'get.allEmployeeIds',
     removeActorName  : 'act.fireEmployee',
     emptyActorName   : 'act.fireEveryone',
    
-    // Define a subtree to represent a single employee
+    // A tree to represent a single employee
     subTree: branchedTree({
         fullname: valueTree({
             valueName    : 'fullname', 
@@ -397,6 +397,7 @@ const { reducer, act, get } = keyedTree({
     })
 });
 
+// Set up example state
 const state = [
     // Hire Dave
     act.hireEmployee({ employeeId: 'dave1234' }), 
