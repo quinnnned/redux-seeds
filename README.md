@@ -337,9 +337,56 @@ reducer(0, act.rotate({degrees: -45}) );
 ```
 
 ## Branched Tree
-This is the redux-seeds version of redux's `combineReducers`.
+This is the redux-seeds version of redux's `combineReducers`.  It accepts a `branches` object, which is a collection of key-state-tree pairs.  This is perfect for composing simpler state trees into more complex ones.  The `act` and `get` of the resulting `branchedTree` contains modified versions of the every actor and seducer attached to each of its branches.  If you were to build a deeply-nested tree with branchedTrees, then adding an actor or selector to the deepest piece of that tree would automatically lift it up to the top of the tree, saving you lots of time.
 
-(more documentation to come)
+### Example
+```js
+import {
+  branchedTree, 
+  valueTree, 
+  durationTree,
+  toggleTree
+} from 'redux-seeds';
+
+// Represents a person
+const personTree = branchedTree({
+    firstName: valueTree({
+        selectorName : 'get.firstName',
+        actorName    : 'act.setFirstName',
+    }),
+    lastName: valueTree({
+        selectorName : 'get.lastName',
+        actorName    : 'act.setLastName',
+    }),
+    awake: toggleTree({
+        selectorName : 'get.isAwake',
+        onActorName  : 'act.wakeUp',
+        offActorName : 'act.fallAsleep'
+    }),
+    writingCode: durationTree('WritingCode')
+});
+
+const { reducer, get, act } = personTree;
+
+// The default state of the branchedTree is composed of the defaults of its branches:
+const defaultState = reducer();
+// { firstName: null, lastName: null, awake: false, writingCode: false }
+
+// The branchedTree has all the actors of its branches
+const johnState = [
+    act.setFirstName({ value: 'John' }),
+    act.setLastName({ value: 'Smith' }),
+    act.wakeUp(),
+    act.startWritingCode()
+].reduce(reducer, undefined);
+// { firstName: "John", lastName: "Smith", awake: true, writingCode: true }
+
+// The branchedTree has all the selectors of its branches
+get.firstName()(johnState)     // "John"
+get.lastName()(johnState)      // "Smith"
+get.isAwake()(johnState)       // true
+get.isWritingCode()(johnState) // true
+```
 
 ## Keyed Tree
 *NOTE: The `keyedTree` requires a lot of documentation in order to be perfeclty clear about what it does, but it's conceptually very simple.  Be sure to check out the example below.*
