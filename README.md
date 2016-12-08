@@ -386,6 +386,23 @@ get.firstName()(johnState)     // "John"
 get.lastName()(johnState)      // "Smith"
 get.isAwake()(johnState)       // true
 get.isWritingCode()(johnState) // true
+
+// Composition can combine selectors from different branches:
+get.compose('fullName', ({get}) => (
+    (options) => (state) => (
+        get.firstName()(state) + ' ' + get.lastName()(state)
+    )
+));
+
+get.fullName()(johnState)
+// "John Smith"
+
+// Composition can also combine actors from different branches
+//   (this example assumes redux-thunk)
+act.compose('stopCodingAndGoToBed', ({act}) => (
+    (options) => (dispatch) => [act.stopCoding(), act.fallAsleep()].map(dispatch)
+));
+
 ```
 
 ## Keyed Tree
