@@ -420,6 +420,7 @@ Creates a tree for representing a dynamic, keyed collection of state trees. This
 Demonstrating all the things that keyedTree handles for you inevitably requires a lengthy example.  Hopefully the succinctness of the design code (relative to what it designs) will demonstrate the power of this seed.
 
 ```js
+import { keyedTree, branchedTree, valueTree, toggleTree } from 'redux-seeds'
 
 // A tree to represent a collection of employees
 const { reducer, act, get } = keyedTree({
