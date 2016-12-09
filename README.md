@@ -28,25 +28,19 @@ require significant boilerplate for common data structures.
 
 The State Tree Pattern solves all of these issues.
 
-A *State Tree* is a JavaScript object with the following structure:
+A **State Tree** is a JavaScript object with the following structure:
 
 ``` js
 const tree = {
     reducer: /* The usual redux reducer */,
-    act: { 
-        /* 
-        * An object of actors, each of the form:
-        *     (options = {}) => action
-        */ 
-    },
-    get: {
-        /* 
-        * An object of state selectors, each of the form:
-        *     (options = {}) => (state = defaultState) => value  
-        */ 
-    } 
+    act: { /*  a map of actorNames to actors */ },
+    get: { /*  a map of selectorNames to selectors */ } 
 }
 ```
+Where: 
++ an **actor** has the form: `(options) => action` or, if using  `redux-thunk`, `(options) => thunk`
++ a **selector** has the form `(options) => (state) => value`
++ and in each case `options` is a JavaScript object for passing parameters to the actor/selector
 
 # Redux Seeds
 A seed is a factory function that returns a specific type of state tree.  You can use them as much or as little as you want to help you build and maintain your state tree; no need to do a rewrite in order to take advantage of this library.
