@@ -161,3 +161,40 @@ test('act.compose prefixes', (assert) => {
 
     assert.end();
 });
+
+test('act.compose: multicomposition', (assert) => {
+
+    const {act} = blankTree();
+
+    act.compose({
+        foo: (tree) => (options) => 'foo',
+        bar: (tree) => (options) => 'bar',
+        baz: (tree) => (options) => 'baz'
+    });
+
+    assert.equal(typeof act.foo, 'function');
+    assert.equal(act.foo(), 'foo');
+    assert.equal(typeof act.bar, 'function');
+    assert.equal(act.bar(), 'bar');
+    assert.equal(typeof act.baz, 'function');
+    assert.equal(act.baz(), 'baz');
+    assert.end();
+});
+
+test('get.compose: multicomposition', (assert) => {
+    const {get} = blankTree();
+
+    get.compose({
+        foo: (tree) => (options) => (state) => 'foo',
+        bar: (tree) => (options) => (state) => 'bar',
+        baz: (tree) => (options) => (state) => 'baz'
+    });
+
+    assert.equal(typeof get.foo, 'function');
+    assert.equal(get.foo()(), 'foo');
+    assert.equal(typeof get.bar, 'function');
+    assert.equal(get.bar()(), 'bar');
+    assert.equal(typeof get.baz, 'function');
+    assert.equal(get.baz()(), 'baz');
+    assert.end();
+});

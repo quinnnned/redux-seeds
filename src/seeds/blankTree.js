@@ -10,12 +10,26 @@ export default () => {
 
 const composable = (root) => {
     const composableObject = {}
-    attachNonEnumerable(composableObject, 'composites', {});
-    attachNonEnumerable(composableObject, 'compose', (name, composite) => {
+
+    const singleCompose = (name, composite) => {
         const normalizedName = nameNormalizer(name);
         composableObject.composites[normalizedName] = composite;
         composableObject[normalizedName] = composite(root);
-    });
+    };
+
+    const multiCompose = (composites) => {
+        Object.keys(composites).forEach(  (name) => {
+            const composite = composites[name];
+            singleCompose(name, composite);
+        });        
+    };
+
+    const compose = (...params) => (
+        (params.length > 1 ? singleCompose : multiCompose )(...params) 
+    );
+
+    attachNonEnumerable(composableObject, 'composites', {});
+    attachNonEnumerable(composableObject, 'compose', compose);
     return composableObject;
 }
 
